@@ -52,15 +52,23 @@ def main(args):
     with torch.no_grad():
         for iter, (g, bg, bg_node, m_ecfp, smiles, feats, prop, root_answer, topo_ans_list,\
                bond_ans_list, label_ans_list, target_id_list) in enumerate(test_loader):
-            g = g.to(torch.device(args.device))
-            n = g.number_of_nodes()
-            h = torch.zeros((n, args.h_size)).to(args.device)
-            c = torch.zeros((n, args.h_size)).to(args.device)
-            feat = feats[0].to(args.device)
-            m_ecfp = m_ecfp[0].to(args.device)
-            smiles = smiles[0]     
-            z, _, _ = model.encoder(g, m_ecfp, smiles, feat, h, c)
-            z_list.append(z.cpu().detach().numpy())
+            try:
+                g = g.to(torch.device(args.device))
+                n = g.number_of_nodes()
+                h = torch.zeros((n, args.h_size)).to(args.device)
+                c = torch.zeros((n, args.h_size)).to(args.device)
+                feat = feats[0].to(args.device)
+                m_ecfp = m_ecfp[0].to(args.device)
+                smiles = smiles[0]     
+                z, _, _ = model.encoder(g, m_ecfp, smiles, feat, h, c)
+                z_list.append(z.cpu().detach().numpy())
+            except Exception as e:
+                print(f"Error at index {iter}: {e}. Inserting zero vector.")
+                # Inserts a 1x256 zero vector
+                # Using h_size because that is typically the latent dimension in this model
+                zero_v = np.zeros((1, 256)) 
+                z_list.append(zero_v)
+                continue
     #Saving
     with open(args.save_path + "/z_list", "wb")as f:
         pickle.dump(z_list, f)
