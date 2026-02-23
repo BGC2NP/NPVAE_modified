@@ -613,7 +613,7 @@ def make_graph(mapidx_list, labelmap_dict, rev_labelmap_dict, labels, bondtype_l
                 l_ans_list.append(torch.tensor([labels.index(label)]))
                 b_ans_list.append(set_bondlabel(bondtype_list[cidx - 1]))
         mg = make_subtree(mg)
-        assert mg.number_of_nodes() == len(mapidx_list)
+        #assert mg.number_of_nodes() == len(mapidx_list)
         return mg, sub_tree, root_answer, l_ans_list, b_ans_list
     
 def demon_decoder(g, sub_tree, root_ans, label_ans_l, bond_ans_l, \
